@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">MyBrand</a>
+            <button class="menu-toggle" id="menu-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li class="dropdown">
+                    <a href="#more" class="dropdown-toggle">More</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#portfolio">Portfolio</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="background-container">
+        <div class="background">
+            <div class="form-container">
+                <div class="form-ner">
+                    <h1>Upload MRI Image for Tumor Detection</h1>
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <label for="image">Select MRI Image:</label>
+                        <input type="file" name="image" id="image" accept="image/*" required>
+                        <button type="submit">Upload and Predict</button>
+                    </form>
+                </div>
+
+                <div id="resultContainer" style="display: none;">
+                    <img id="uploadedImage" src="" alt="Uploaded Image">
+                    <p class="result" id="predictionResult"></p>
+                    <div id="segmentationContainer" style="display: none;">
+                         <h2 id="title" style="color: red;"></h2>
+                         <img id="segmentedImage" src="" alt="Segmentation Result" style="max-width: 90%; margin-top: 5px;">
+                     </div>
+                     <!-- CHANGED -->
+                     <div style="display: flex; justify-content: center; align-items: center; gap: 25px; ">
+                        <div >
+                            <button id="checkTypeButton" style="display: none;">Check Type</button>
+                            <p id="typeResult" style="display: none;"></p>
+                        </div>
+                        <div>
+                            <button id="growth_rate" style="display: none;">Growth rate</button>
+                           
+                        </div>
+
+                 
+                    <!-- CHANGED: Added segmentation display -->
+                    
+                </div>
+            </div>
+        </div>
+        <div class="form-container1" style="display: none;">
+            <h2>--- Make a Prediction ---</h2>
+            <form id="predictionForm">
+                <div class="form-group"><label>Age:</label><input type="number" name="Age" required></div>
+                <div class="form-group"><label>Tumor Size:</label><input type="number" name="Tumor_Size"   step="any" required></div>
+                <div class="form-group"><label>Gender:</label><input type="text" name="Gender" required></div>
+                <div class="form-group"><label>Tumor Location:</label><input type="text" name="Tumor_Location" required></div>
+                <div class="form-group"><label>MRI Findings:</label><input type="text" name="MRI_Findings" required></div>
+                <div class="form-group"><label>Smoking History:</label><input type="text" name="Smoking_History" required></div>
+                <div class="form-group"><label>Alcohol Consumption:</label><input type="text" name="Alcohol_Consumption" required></div>
+                <div class="form-group"><label>Radiation Exposure:</label><input type="text" name="Radiation_Exposure" required></div>
+                <div class="form-group"><label>Head Injury History:</label><input type="text" name="Head_Injury_History" required></div>
+                <div class="form-group"><label>Blood Pressure:</label><input type="text" name="Blood_Pressure" required></div>
+                <div class="form-group"><label>Diabetes:</label><input type="text" name="Diabetes" required></div>
+                <div class="form-group"><label>Tumor Type:</label><input type="text" name="Tumor_Type" required></div>
+                <div class="form-group"><label>Treatment Received:</label><input type="text" name="Treatment_Received" required></div>
+                <div class="form-group"><label>Family History:</label><input type="text" name="Family_History" required></div>
+                <div class="form-group"><label>Symptom Severity:</label><input type="text" name="Symptom_Severity" required></div>
+                <button type="submit">Predict</button>
+            </form>
+            <div id="result1"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById('uploadForm');
+            const ff = document.querySelector('.form-container');
+            const formContainer = document.querySelector('.form-ner');
+            const resultContainer = document.getElementById('resultContainer');
+            const tt = document.getElementById('title');
+
+            const uploadedImage = document.getElementById('uploadedImage');
+            const predictionResult = document.getElementById('predictionResult');
+            const typeResult = document.getElementById('typeResult');
+            const checkTypeButton = document.getElementById('checkTypeButton');
+            
+
+            // CHANGED: Added segmented image reference
+            const segmentationContainer = document.getElementById('segmentationContainer');
+            const segmentedImage = document.getElementById('segmentedImage');
+            // CHANGED
+            const predictionForm = document.getElementById('predictionForm');
+            const result1 = document.getElementById('result1');
+            const growthRateBtn = document.getElementById('growth_rate');
+            const predictionFormContainer = document.querySelector('.form-container1');
+            let originalBase64Image = ""; 
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch('/predict', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+            
+                        formContainer.innerHTML = '';
+            
+                        uploadedImage.src = `data:image/png;base64,${data.image_base64}`;
+                        predictionResult.textContent = `Prediction: ${data.result}`;
+            
+                        // Show segmentation only if available
+                        if (data.segmented_image_base64) {
+                            ff.classList.add('wide');  // Expands the form container
+
+                            predictionResult.style.display = 'none'; // Hide the prediction result
+                            segmentedImage.src = `data:image/png;base64,${data.segmented_image_base64}`;
+                            originalBase64Image = `data:image/png;base64,${data.image_base64}`;  // store original base64
+
+                            tt.textContent = `Prediction: ${data.result}`; // Set the title for segmentation
+                            segmentationContainer.style.display = 'block';
+                            uploadedImage.style.display = 'none'; // Hide the original image
+                        } else {
+                            segmentationContainer.style.display = 'none';
+                        }
+            
+                        // Set result color and toggle type check
+                        if (data.result.toLowerCase() === 'healthy') {
+                            ff.classList.add('healthy'); 
+                            predictionResult.style.color = 'green';
+                            checkTypeButton.style.display = 'none';
+                        } else if (data.result.toLowerCase() === 'tumorous') {
+                            predictionResult.style.color = 'red';
+                            checkTypeButton.style.display = 'inline-block';
+                            growthRateBtn.style.display = 'inline-block';
+                        }
+            
+                        resultContainer.style.display = 'block';
+                    } else {
+                        console.error('Error:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            });
+
+            checkTypeButton.addEventListener('click', async () => {
+                if (!originalBase64Image) {
+                    alert("No image found! Please upload an MRI image first.");
+                    return;
+                }
+            
+                try {
+                    const response = await fetch("/check_type", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ image_url: originalBase64Image })
+                    });
+            
+                    if (response.ok) {
+                        const data = await response.json();
+                        typeResult.textContent = `Tumor Type: ${data.tumor_type}`;
+                        typeResult.style.display = "block";
+                    } else {
+                        console.error("Error:", response.statusText);
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                }
+            });
+            predictionForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+            
+                const formData = new FormData(predictionForm);
+                const jsonData = {};
+            
+                // Convert FormData to JSON
+                formData.forEach((value, key) => {
+                    jsonData[key] = value;
+                });
+            
+                try {
+                    const response = await fetch('/predict_details', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(jsonData),
+                    });
+            
+                    const data = await response.json();
+            
+                    if (response.ok) {
+                        result1.innerHTML = `<strong>Prediction:</strong> ${data.result}`;
+                    } else {
+                        result1.innerHTML = `<span style="color:red;">Error:</span> ${data.message || "Something went wrong!"}`;
+                    }
+                } catch (error) {
+                    console.error("Prediction request failed:", error);
+                    result1.innerHTML = `<span style="color:red;">Network error occurred.</span>`;
+                }
+            });
+            
+            growthRateBtn.addEventListener('click', function () {
+                predictionFormContainer.style.display = 'block';
+            });
+            
+        });
+    </script>
+</body>
+</html>
