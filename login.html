@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}"> 
+</head>
+<body>
+    <div class="outer-box">
+        <div class="inner-box">
+            <header class="signup-header">
+                <h1>Login</h1>
+                
+            </header>
+            <main class="signup-body">
+                    <form action="/log_in" method="post">
+                        <p>
+                            <label for="full name">Full name</label>
+                            <input type="text" id="full name" name="username" placeholder="Minhaz" required> 
+                        </p>
+                      
+                        <p>
+                            <label for="password ">Password</label>
+                            <input type="password" id="password" name="password" placeholder="at least 8 characters" required>
+                        </p>
+                        <p>
+                            <input type="submit" id="submit" value="Login">
+                        </p>
+                    
+                    </form>
+                </main>
+                <footer class="signup-footer">
+                    <p>Don't have an Account?<a href="reg">SignUp</a></p>
+                </footer> 
+                
+        </div>
+        <div>
+            <div class="circle c1"></div>
+            <div class="circle c2"></div>
+        </div>
+     
+    </div>
+  
+</body>
+</html>
