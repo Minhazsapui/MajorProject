@@ -1,0 +1,12 @@
+# Ignore virtual environment
+myenv/
+brain_tumor_dataset/
+mri_dataset/
+
+# Ignore model files
+*.h5
+*.pyd
+*.dll
+*.ipynb
+*.pptx
+*.keras

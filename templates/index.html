@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">MyBrand</a>
+            <button class="menu-toggle" id="menu-toggle">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#services">Services</a></li>
+                <li class="dropdown">
+                    <a href="#more" class="dropdown-toggle">More</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#portfolio">Portfolio</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="background-container">
+        <!-- Add any content you want below the navbar here -->
+
+
+        <div class="background-container">
+            <!-- Add any content you want below the navbar here -->
+            <div class="background">
+        
+            <div class="form-container">
+                <div class="form-ner"><h1>Upload MRI Image for Tumor Detection</h1>
+                    <form action="/predict" method="POST" id= "uploadForm" enctype="multipart/form-data">
+                        <label for="file">Select MRI Image:</label>
+                        <input type="file" name="file" id="file" accept="image/*" required>
+                        <button type="submit">Upload and Predict</button>
+                    </form>
+                 </div>
+                 <div id="resultContainer" style="display: none;">
+                    <img id="uploadedImage" src="" alt="Uploaded Image">
+                    <p class="result" id="predictionResult"></p>
+                    <button id="checkTypeButton" style="display: none;">Check Type</button>
+                    <p id="typeResult" style="display: none;"></p> 
+
+                </div>
+                
+        
+               
+            </div>
+            
+            </div>
+        </div>
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const form = document.getElementById('uploadForm');
+                const formContainer = document.querySelector('.form-ner');
+                const resultContainer = document.getElementById('resultContainer');
+                const uploadedImage = document.getElementById('uploadedImage');
+                const predictionResult = document.getElementById('predictionResult');
+                const typeResult = document.getElementById('typeResult');
+                const checkTypeButton = document.getElementById('checkTypeButton');
+        
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(form);
+        
+                    try {
+                        const response = await fetch('/predict', {
+                            method: 'POST',
+                            body: formData,
+                        });
+        
+                        if (response.ok) {
+                            const data = await response.json();
+        
+                            formContainer.innerHTML = '';
+                            uploadedImage.src = data.image_url;
+                            predictionResult.textContent = `Prediction: ${data.result}`;
+                            
+                            if (data.result.toLowerCase() === 'healthy') {
+                                predictionResult.style.color = 'green'; 
+                                checkTypeButton.style.display = 'none'; // Hide if healthy
+                            } else if (data.result.toLowerCase() === 'tumorous') {
+                                predictionResult.style.color = 'red'; 
+                                checkTypeButton.style.display = 'inline-block'; // Show if tumorous
+                            }
+                            resultContainer.style.display = 'block';
+        
+                        } else {
+                            console.error('Error:', response.statusText);
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                    }
+                });
+        
+                // ✅ Ensure button works
+                checkTypeButton.addEventListener('click', async () => {
+
+                    
+                    const imageUrl = uploadedImage.src;
+        
+                    if (!imageUrl) {
+                        alert("No image found! Please upload an MRI image first.");
+                        return;
+                    }
+        
+                    try {
+                        const response = await fetch("/check_type", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ image_url: imageUrl }) 
+                        });
+        
+                        if (response.ok) {
+                            const data = await response.json();
+                            typeResult.textContent = `Tumor Type: ${data.tumor_type}`;
+                            typeResult.style.display = "block";
+                        } else {
+                            console.error("Error:", response.statusText);
+                        }
+                    } catch (error) {
+                        console.error("Error:", error);
+                    }a
+                });
+            });
+        </script>
+        
+</body>
+</html>

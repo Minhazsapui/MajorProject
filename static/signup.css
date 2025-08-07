@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+
+}
+body {
+    background-image: url(medical-equipment-with-copy-space.jpg);
+    /* Other background properties */
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center; 
+    width: 100vw;
+    height: 100vh;
+}
+
+body{
+    font-family: 'Lato', sans-serif;
+}
+.outer-box{
+    width: 100vw;
+    height: 100vh;
+    /*background: linear-gradient(to top left, red,blue);*/
+}
+.inner-box{
+    width: 400px;
+    margin: 0 auto;
+    position: relative;
+    top: 19%;
+    /* transform: translateY(-50%); */
+    padding: 20px 40px;
+    /* background-color: white; */
+    background: linear-gradient(to top left,#ffffffff,#ffffff33 );
+    backdrop-filter: blur(8px);
+    border-radius: 8px;
+    box-shadow: 4px 4px 10px rgb(1, 24, 7);
+    z-index: 2;
+
+}
+.signup-header h1{
+    font-size: 2.5rem;
+    color:rgb(13, 1, 1);
+}
+.signup-header p{
+    font-size: 0.9rem;
+    color: #1b0303;
+    margin: 3px;
+}
+.signup-body{
+    margin: 20px 0;
+}
+.signup-body p{
+    margin: 10px 0;
+}
+.signup-body p label{
+    display: block;
+    font-weight: 600;
+}
+.signup-body p input{
+    width: 100%;
+    padding: 10px;
+    margin-top: 4px;
+    border: 2px solid #710a0a;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+.signup-body p input[type="submit"]{
+    background-color: blanchedalmond;
+    border: none;
+    color: rgb(13, 14, 13);
+    font-size: medium;
+    cursor: pointer;
+    font-weight: 500;
+
+}
+.signup-body p input[type="submit"]:hover{
+    background-color: rgb(217, 202, 176);
+    font-weight: 600;
+}
+.signup-footer p{
+    color: #130303;
+    text-align: center;
+}
+.signup-footer p a{
+    color: rgb(107, 67, 7);
+    margin: 0 5px;
+}
+.circle{
+    width: 140px;
+    height: 140px;
+    border-radius: 70px;
+    position: absolute;
+    background: linear-gradient(to top right,#ffffff03,#ffffffff);
+}
+.c1{
+    top: 30px;
+    left: 300px;
+}
+.c2{
+    top: 550px;
+    right: 300px;
+}
